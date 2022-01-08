@@ -8,7 +8,7 @@ To install, add it to your `pubspec.yaml` file:
 
 ```
 dependencies:
-    search_map_location: 0.0.1
+    search_map_location: 0.0.4
 ```
 
 After that, make sure you have the following APIs activated in your Google Cloud Platform:
@@ -24,7 +24,7 @@ import 'package:search_map_location/search_map_location.dart';
 Widget build(BuildContext context) {
   return Scaffold(
     body: Center(
-      child: SearchMapPlaceWidget(
+      child: SearchLocation(
         apiKey: // YOUR GOOGLE MAPS API KEY
         onSelected: (Place place){
         print(place.description);
@@ -36,11 +36,12 @@ Widget build(BuildContext context) {
 }
 ```
 
-The constructor has 7 attributes related to the API:
+The constructor has 8 attributes related to the API:
 - `String apiKey` is the only required attribute. It is the Google Maps API Key your application is using
 - `(Place) void onSelected` is a callback function called when the user selects one of the autocomplete options.
 - `(Place) void onSearch` is a callback function called when the user clicks on the search icon.
 - `String language` is the Language used for the autocompletion. Default is 'en' (english). Check the full list of [supported languages](https://developers.google.com/maps/faq#languagesupport) for the Google Maps API
+- `String country` you can allow the search work only for a specific country.While using `country` don't use `location` and `radius`  .Use ISO(Use alpha 2) code for country name [see iso code of countries](https://www.nationsonline.org/oneworld/country_code_list.htm)
 - `LatLng location` is the point around which you wish to retrieve place information. If this value is provided, `radius` must be provided aswell.
 - `int radius` is the distance (in meters) within which to return place results. Note that setting a radius biases results to the indicated area, but may not fully restrict results to the specified area. If this value is provided, `location` must be provided aswell. See [Location Biasing and Location Restrict](https://developers.google.com/places/web-service/autocomplete#location_biasing) in the Google Maps API documentation.
 - `bool restrictBounds` will return only those places that are strictly within the region defined by `location` and `radius`.
@@ -63,10 +64,31 @@ await place.geolocation;
 
 ## Example
 
-Here's an example of the widget being used:
+Here's an example of the widget using `country` :
 
 ```dart
-return SearchMapPlaceWidget(
+return SearchLocation(
+    apiKey: YOUR_API_KEY,
+    // The language of the autocompletion
+    language: 'en',
+    //Search only work for this specific country
+    country: 'BD',
+    onSelected: (Place place) async {
+        final geolocation = await place.geolocation;
+
+        // Will animate the GoogleMap camera, taking us to the selected position with an appropriate zoom
+        final GoogleMapController controller = await _mapController.future;
+        controller.animateCamera(CameraUpdate.newLatLng(geolocation.coordinates));
+        controller.animateCamera(CameraUpdate.newLatLngBounds(geolocation.bounds, 0));
+    },
+);
+```
+
+
+Here's an example of the widget using `location` and `radius` :
+
+```dart
+return SearchLocation(
     apiKey: YOUR_API_KEY,
     // The language of the autocompletion
     language: 'en',

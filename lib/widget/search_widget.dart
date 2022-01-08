@@ -32,6 +32,11 @@ class SearchLocation extends StatefulWidget {
   /// Check the full list of [supported languages](https://developers.google.com/maps/faq#languagesupport) for the Google Maps API
   final String language;
 
+  /// set search only work for a country
+  ///
+  /// While using country don't use LatLng and radius
+  final String ? country;
+
   /// The point around which you wish to retrieve place information.
   ///
   /// If this value is provided, `radius` must be provided aswell.
@@ -77,6 +82,7 @@ class SearchLocation extends StatefulWidget {
     this.onChangeText,
     this.onClearIconPress,
     this.language = 'en',
+    this.country,
     this.location,
     this.radius,
     this.strictBounds = false,
@@ -185,9 +191,18 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
       if (widget.strictBounds) {
         url += "&strictbounds";
       }
-      if (widget.placeType != null) {
-        url += "&types=${widget.placeType!.apiString}";
-      }
+    }
+
+    if (widget.placeType != null) {
+
+      url += "&types=${widget.placeType!.apiString}";
+
+    }
+
+    if(widget.country != null){
+
+      url += "&components=country:${widget.country}";
+
     }
 
     final response = await http.get(Uri.parse(url));

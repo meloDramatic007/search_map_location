@@ -48,12 +48,12 @@ class Place {
   var fullJSON;
 
   late Geocoding _geocode;
-  late Geolocation  _geolocation;
+  Geolocation ? _geolocation;
 
   /// Fetches the Geolocation API from Google Maps to get more information about the place, including coordinates, bounds, etc.
   ///
   /// Learn more at [Geolocation docs](https://developers.google.com/maps/documentation/geolocation/intro)
-  Future<Geolocation> get geolocation async {
+  Future<Geolocation?> get geolocation async {
     if (this._geolocation == null) {
       this._geolocation = await _geocode.getGeolocation(description);
       return _geolocation;
