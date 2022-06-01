@@ -372,7 +372,8 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
               onTap: () {
                 if (_crossFadeState == CrossFadeState.showSecond){
                   _textEditingController.clear();
-                  widget.onClearIconPress!();
+                  if(widget.onClearIconPress!=null)
+                   widget.onClearIconPress!();
                 }
               },
               // child: Icon(_inputIcon, color: this.widget.iconColor),

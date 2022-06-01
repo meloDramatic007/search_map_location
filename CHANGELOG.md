@@ -12,3 +12,8 @@ Update `Readme.md` file
 
 * TODO: Describe initial release.
 Update `Readme.md` file
+
+## 0.0.5
+
+* TODO: Describe initial release.
+Fixed `GeoLocation` class late initialization error

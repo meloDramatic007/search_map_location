@@ -1,6 +1,6 @@
 name: search_map_location
 description: search_map_location is a  text search widget used to search geo location by name.It has severel call back and customization option to handle the place search.
-version: 0.0.4
+version: 0.0.5
 homepage: https://github.com/meloDramatic007/search_map_location
 
 environment:
