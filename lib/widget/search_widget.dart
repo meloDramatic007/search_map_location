@@ -190,7 +190,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
         return;
       }
 
-      Future.delayed(Duration(milliseconds: 500), () {
+      Future.delayed(Duration(milliseconds: 400), () {
         _textEditingController.addListener(_autocompletePlace);
         if (_isEditing == true) _autocompletePlace();
       });
