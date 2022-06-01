@@ -182,7 +182,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
 
       if (_currentInput == _tempInput) {
         final predictions = await _makeRequest(_currentInput);
-        await _animationController.animateTo(0.5);
+        await _animationController.animateTo(0.4);
         setState(() => _placePredictions = predictions);
         await _animationController.forward();
 
