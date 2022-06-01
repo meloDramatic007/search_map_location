@@ -235,7 +235,8 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     _closeSearch();
 
     // Calls the `onSelected` callback
-    if (prediction is Place) widget.onSelected!(prediction);
+    if (prediction != null)
+     widget.onSelected!(prediction);
   }
 
   void _closeSearch() async {
@@ -360,6 +361,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
               onEditingComplete: _selectPlace,
               autofocus: false,
               focusNode: _fn,
+
               style: TextStyle(
                 fontSize: MediaQuery.of(context).size.width * 0.04,
                 color: widget.darkMode ? Colors.grey[100] : Colors.grey[850],
