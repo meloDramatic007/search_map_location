@@ -113,40 +113,54 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
   FocusNode _fn = FocusNode();
 
   late CrossFadeState  _crossFadeState;
+  bool _isInit=false;
+
+
+  @override
+  void didChangeDependencies() {
+
+    if(!_isInit){
+
+      geocode = Geocoding(apiKey: widget.apiKey, language: widget.language);
+      _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+      _containerHeight = Tween<double>(begin: 55, end: 364).animate(
+        CurvedAnimation(
+          curve: Interval(0.0, 0.5, curve: Curves.easeInOut),
+          parent: _animationController,
+        ),
+      );
+      _listOpacity = Tween<double>(
+        begin: 0,
+        end: 1,
+      ).animate(
+        CurvedAnimation(
+          curve: Interval(0.5, 1.0, curve: Curves.easeInOut),
+          parent: _animationController,
+        ),
+      );
+
+      _textEditingController.addListener(_autocompletePlace);
+      customListener();
+
+      if (widget.hasClearButton) {
+        _fn.addListener(() async {
+          if (_fn.hasFocus)
+            setState(() => _crossFadeState = CrossFadeState.showSecond);
+          else
+            setState(() => _crossFadeState = CrossFadeState.showFirst);
+        });
+        _crossFadeState = CrossFadeState.showFirst;
+      }
+
+    }
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+  }
 
   @override
   void initState() {
 
-    geocode = Geocoding(apiKey: widget.apiKey, language: widget.language);
-    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    _containerHeight = Tween<double>(begin: 55, end: 364).animate(
-      CurvedAnimation(
-        curve: Interval(0.0, 0.5, curve: Curves.easeInOut),
-        parent: _animationController,
-      ),
-    );
-    _listOpacity = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        curve: Interval(0.5, 1.0, curve: Curves.easeInOut),
-        parent: _animationController,
-      ),
-    );
 
-    _textEditingController.addListener(_autocompletePlace);
-    customListener();
-
-    if (widget.hasClearButton) {
-      _fn.addListener(() async {
-        if (_fn.hasFocus)
-          setState(() => _crossFadeState = CrossFadeState.showSecond);
-        else
-          setState(() => _crossFadeState = CrossFadeState.showFirst);
-      });
-      _crossFadeState = CrossFadeState.showFirst;
-    }
 
     super.initState();
   }
