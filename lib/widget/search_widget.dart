@@ -304,7 +304,8 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
           return Container(
             height: _containerHeight!.value,
             decoration: _containerDecoration(),
-            child: Column(
+            child:SingleChildScrollView(
+              child: Column(
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 4),
@@ -321,7 +322,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                     ),
                   ),
               ],
-            ),
+            ),),
           );
         });
   }
