@@ -7,25 +7,24 @@ import 'dart:convert';
 import '../utils/google_search/place.dart';
 import '../utils/google_search/place_type.dart';
 
-
 class SearchLocation extends StatefulWidget {
   //final Key ? key;
 
   /// API Key of the Google Maps API.
-  final String  apiKey;
+  final String apiKey;
   //text change im search
-  final void Function(String value) ? onChangeText;
+  final void Function(String value)? onChangeText;
 
-  final void Function() ? onClearIconPress;
+  final void Function()? onClearIconPress;
 
   /// Placeholder text to show when the user has not entered any input.
   final String placeholder;
 
   /// The callback that is called when one Place is selected by the user.
-  final void Function(Place place) ? onSelected;
+  final void Function(Place place)? onSelected;
 
   /// The callback that is called when the user taps on the search icon.
-  final void Function(Place place) ? onSearch;
+  final void Function(Place place)? onSearch;
 
   /// Language used for the autocompletion.
   ///
@@ -35,25 +34,25 @@ class SearchLocation extends StatefulWidget {
   /// set search only work for a country
   ///
   /// While using country don't use LatLng and radius
-  final String ? country;
+  final String? country;
 
   /// The point around which you wish to retrieve place information.
   ///
   /// If this value is provided, `radius` must be provided aswell.
-  final LatLng ? location;
+  final LatLng? location;
 
   /// The distance (in meters) within which to return place results. Note that setting a radius biases results to the indicated area, but may not fully restrict results to the specified area.
   ///
   /// If this value is provided, `location` must be provided aswell.
   ///
   /// See [Location Biasing and Location Restrict](https://developers.google.com/places/web-service/autocomplete#location_biasing) in the documentation.
-  final int ? radius;
+  final int? radius;
 
   /// Returns only those places that are strictly within the region defined by location and radius. This is a restriction, rather than a bias, meaning that results outside this region will not be returned even if they match the user input.
   final bool strictBounds;
 
   /// Place type to filter the search. This is a tool that can be used if you only want to search for a specific type of location. If this no place type is provided, all types of places are searched. For more info on location types, check https://developers.google.com/places/web-service/autocomplete?#place_types
-  final PlaceType ? placeType;
+  final PlaceType? placeType;
 
   /// The initial icon to show in the search box
   final IconData icon;
@@ -62,7 +61,10 @@ class SearchLocation extends StatefulWidget {
   final bool hasClearButton;
 
   /// The icon to show indicating the "clear textfield" button
-  final IconData clearIcon;
+  final Widget? clearIcon;
+
+   /// The icon to show indicating the "search" 
+  final Widget? searchIcon;
 
   /// The color of the icon to show in the search box
   final Color iconColor;
@@ -75,7 +77,8 @@ class SearchLocation extends StatefulWidget {
     this.placeholder = 'Search',
     this.icon = Icons.search,
     this.hasClearButton = true,
-    this.clearIcon = Icons.clear,
+    this.searchIcon,
+    this.clearIcon ,
     this.iconColor = Colors.blue,
     this.onSelected,
     this.onSearch,
@@ -88,41 +91,40 @@ class SearchLocation extends StatefulWidget {
     this.strictBounds = false,
     this.placeType,
     this.darkMode = false,
-    Key ? key,
-  }): super(key: key);
+    Key? key,
+  }) : super(key: key);
 
   @override
   _SearchLocationState createState() => _SearchLocationState();
 }
 
-class _SearchLocationState extends State<SearchLocation> with TickerProviderStateMixin{
+class _SearchLocationState extends State<SearchLocation>
+    with TickerProviderStateMixin {
   TextEditingController _textEditingController = TextEditingController();
-  late AnimationController  _animationController;
+  late AnimationController _animationController;
   // SearchContainer height.
-  Animation ? _containerHeight;
+  Animation? _containerHeight;
   // Place options opacity.
   Animation? _listOpacity;
 
   List<dynamic> _placePredictions = [];
   bool _isEditing = false;
-  Geocoding ? geocode;
+  Geocoding? geocode;
 
   String _tempInput = "";
   String _currentInput = "";
 
   FocusNode _fn = FocusNode();
 
-  late CrossFadeState  _crossFadeState;
-  bool _isInit=false;
-
+  late CrossFadeState _crossFadeState;
+  bool _isInit = false;
 
   @override
   void didChangeDependencies() {
-
-    if(!_isInit){
-
+    if (!_isInit) {
       geocode = Geocoding(apiKey: widget.apiKey, language: widget.language);
-      _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+      _animationController = AnimationController(
+          vsync: this, duration: Duration(milliseconds: 500));
       _containerHeight = Tween<double>(begin: 55, end: 364).animate(
         CurvedAnimation(
           curve: Interval(0.0, 0.5, curve: Curves.easeInOut),
@@ -151,7 +153,6 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
         });
         _crossFadeState = CrossFadeState.showFirst;
       }
-
     }
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
@@ -159,9 +160,6 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
 
   @override
   void initState() {
-
-
-
     super.initState();
   }
 
@@ -201,22 +199,19 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     String url =
         "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&key=${widget.apiKey}&language=${widget.language}";
     if (widget.location != null && widget.radius != null) {
-      url += "&location=${widget.location!.latitude},${widget.location!.longitude}&radius=${widget.radius}";
+      url +=
+          "&location=${widget.location!.latitude},${widget.location!.longitude}&radius=${widget.radius}";
       if (widget.strictBounds) {
         url += "&strictbounds";
       }
     }
 
     if (widget.placeType != null) {
-
       url += "&types=${widget.placeType!.apiString}";
-
     }
 
-    if(widget.country != null){
-
+    if (widget.country != null) {
       url += "&components=country:${widget.country}";
-
     }
 
     final response = await http.get(Uri.parse(url));
@@ -225,7 +220,8 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     if (extractedData["error_message"] != null) {
       var error = extractedData["error_message"];
       if (error == "This API project is not authorized to use this API.")
-        error += " Make sure the Places API is activated on your Google Cloud Platform";
+        error +=
+            " Make sure the Places API is activated on your Google Cloud Platform";
       throw Exception(error);
     } else {
       final predictions = extractedData["predictions"];
@@ -233,7 +229,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     }
   }
 
-  void _selectPlace({Place ? prediction}) async {
+  void _selectPlace({Place? prediction}) async {
     if (prediction != null) {
       _textEditingController.value = TextEditingValue(
         text: prediction.description,
@@ -249,12 +245,12 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     _closeSearch();
 
     // Calls the `onSelected` callback
-    if (prediction != null)
-     widget.onSelected!(prediction);
+    if (prediction != null) widget.onSelected!(prediction);
   }
 
   void _closeSearch() async {
-    if (!_animationController.isDismissed) await _animationController.animateTo(0.5);
+    if (!_animationController.isDismissed)
+      await _animationController.animateTo(0.5);
     _fn.unfocus();
     setState(() {
       _placePredictions = [];
@@ -266,13 +262,12 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
 
   void customListener() {
     Future.delayed(Duration(milliseconds: 500), () {
-      if(mounted){
-        setState((){
+      if (mounted) {
+        setState(() {
           _tempInput = _textEditingController.text;
         });
         customListener();
       }
-
     });
   }
 
@@ -284,8 +279,6 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -296,8 +289,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     );
   }
 
-
-  Widget _searchContainer({@required Widget ? child}) {
+  Widget _searchContainer({@required Widget? child}) {
     return AnimatedBuilder(
         animation: _animationController,
         builder: (context, _) {
@@ -307,7 +299,8 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
             child: Column(
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 4),
+                  padding:
+                      const EdgeInsets.only(left: 12.0, right: 12.0, top: 4),
                   child: child,
                 ),
                 if (_placePredictions.length > 0)
@@ -334,7 +327,9 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
       onPressed: () => _selectPlace(prediction: prediction),
       child: ListTile(
         title: Text(
-          place.length < 45 ? "$place" : "${place.replaceRange(45, place.length, "")} ...",
+          place.length < 45
+              ? "$place"
+              : "${place.replaceRange(45, place.length, "")} ...",
           style: TextStyle(
             fontSize: MediaQuery.of(context).size.width * 0.04,
             color: widget.darkMode ? Colors.grey[100] : Colors.grey[850],
@@ -353,7 +348,9 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     return BoxDecoration(
       color: widget.darkMode ? Colors.grey[800] : Colors.white,
       borderRadius: BorderRadius.all(Radius.circular(6.0)),
-      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: 10)],
+      boxShadow: [
+        BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: 10)
+      ],
     );
   }
 
@@ -363,11 +360,10 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
         children: <Widget>[
           Expanded(
             child: TextField(
-              onChanged: (value){
-                if(widget.onChangeText!=null){
+              onChanged: (value) {
+                if (widget.onChangeText != null) {
                   widget.onChangeText!(value);
                 }
-
               },
               decoration: _inputStyle(),
               controller: _textEditingController,
@@ -375,48 +371,48 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
               onEditingComplete: _selectPlace,
               autofocus: false,
               focusNode: _fn,
-
               style: TextStyle(
                 fontSize: MediaQuery.of(context).size.width * 0.04,
                 color: widget.darkMode ? Colors.grey[100] : Colors.grey[850],
               ),
             ),
           ),
-          Container(width: 15),
-          if (widget.hasClearButton)
-            GestureDetector(
-              onTap: () {
-                if (_crossFadeState == CrossFadeState.showSecond){
-                  _textEditingController.clear();
-                  if(widget.onClearIconPress!=null)
-                   widget.onClearIconPress!();
-                }
-              },
-              // child: Icon(_inputIcon, color: this.widget.iconColor),
-              child: AnimatedCrossFade(
-                crossFadeState: _crossFadeState,
-                duration: Duration(milliseconds: 300),
-                firstChild: Icon(widget.icon, color: widget.iconColor),
-                secondChild: Icon(Icons.clear, color: widget.iconColor),
-              ),
-            ),
-          if (!widget.hasClearButton) Icon(widget.icon, color: widget.iconColor)
+          // Container(width: 15),
+          // if (widget.hasClearButton)
+          //   GestureDetector(
+          //     onTap: () {
+          //       if (_crossFadeState == CrossFadeState.showSecond){
+          //         _textEditingController.clear();
+          //         if(widget.onClearIconPress!=null)
+          //          widget.onClearIconPress!();
+          //       }
+          //     },
+          //     // child: Icon(_inputIcon, color: this.widget.iconColor),
+          //     child: AnimatedCrossFade(
+          //       crossFadeState: _crossFadeState,
+          //       duration: Duration(milliseconds: 300),
+          //       firstChild: Icon(widget.icon, color: widget.iconColor),
+          //       secondChild: Icon(Icons.clear, color: widget.iconColor),
+          //     ),
+          //   ),
+          // if (!widget.hasClearButton) Icon(widget.icon, color: widget.iconColor)
         ],
       ),
     );
   }
 
-
-
   InputDecoration _inputStyle() {
     return InputDecoration(
       hintText: this.widget.placeholder,
       border: InputBorder.none,
+      prefixIcon: widget.searchIcon ?? Icon(Icons.search, color: widget.iconColor),
+      suffixIcon: widget.hasClearButton
+          ? widget.clearIcon ?? Icon(Icons.clear, color: widget.iconColor)
+          : null,
       contentPadding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
       hintStyle: TextStyle(
         color: widget.darkMode ? Colors.grey[100] : Colors.grey[850],
       ),
     );
   }
-
 }
