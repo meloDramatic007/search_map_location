@@ -8,7 +8,7 @@ import '../utils/google_search/place.dart';
 import '../utils/google_search/place_type.dart';
 
 class SearchLocation extends StatefulWidget {
-  //final Key ? key;
+ //final Key ? key;
 
   /// API Key of the Google Maps API.
   final String apiKey;
@@ -54,14 +54,8 @@ class SearchLocation extends StatefulWidget {
   /// Place type to filter the search. This is a tool that can be used if you only want to search for a specific type of location. If this no place type is provided, all types of places are searched. For more info on location types, check https://developers.google.com/places/web-service/autocomplete?#place_types
   final PlaceType? placeType;
 
- 
-
   /// Makes available "clear textfield" button when the user is writing.
   final bool hasClearButton;
-
-
-
-  
 
   /// The color of the icon to show in the search box
   final Color iconColor;
@@ -119,44 +113,55 @@ class _SearchLocationState extends State<SearchLocation>
   late CrossFadeState _crossFadeState;
   bool _isInit = false;
 
-  @override
-  void didChangeDependencies() {
-    if (!_isInit) {
-      geocode = Geocoding(apiKey: widget.apiKey, language: widget.language);
-      _animationController = AnimationController(
-          vsync: this, duration: Duration(milliseconds: 500));
-      _containerHeight = Tween<double>(begin: 55, end: 364).animate(
-        CurvedAnimation(
-          curve: Interval(0.0, 0.5, curve: Curves.easeInOut),
-          parent: _animationController,
-        ),
-      );
-      _listOpacity = Tween<double>(
-        begin: 0,
-        end: 1,
-      ).animate(
-        CurvedAnimation(
-          curve: Interval(0.5, 1.0, curve: Curves.easeInOut),
-          parent: _animationController,
-        ),
-      );
-
-      _textEditingController.addListener(_autocompletePlace);
-      customListener();
-
-      if (widget.hasClearButton) {
-        _fn.addListener(() async {
-          if (_fn.hasFocus)
-            setState(() => _crossFadeState = CrossFadeState.showSecond);
-          else
-            setState(() => _crossFadeState = CrossFadeState.showFirst);
-        });
-        _crossFadeState = CrossFadeState.showFirst;
-      }
-    }
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
+  bool isKeyboardOpen(BuildContext context) {
+    return MediaQuery.of(context).viewInsets.bottom > 0;
   }
+
+  
+
+@override
+void didChangeDependencies() {
+  if (!_isInit) {
+    geocode = Geocoding(apiKey: widget.apiKey, language: widget.language);
+    _animationController = AnimationController(
+      vsync: this, duration: Duration(milliseconds: 500),
+    );
+
+    _containerHeight = Tween<double>(begin: 55, end: 364).animate(
+      CurvedAnimation(
+        curve: Interval(0.0, 0.5, curve: Curves.easeInOut),
+        parent: _animationController,
+      ),
+    );
+    _listOpacity = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(
+      CurvedAnimation(
+        curve: Interval(0.5, 1.0, curve: Curves.easeInOut),
+        parent: _animationController,
+      ),
+    );
+
+    _textEditingController.addListener(_autocompletePlace);
+    customListener();
+
+    if (widget.hasClearButton) {
+      _fn.addListener(() async {
+        if (_fn.hasFocus)
+          setState(() => _crossFadeState = CrossFadeState.showSecond);
+        else
+          setState(() => _crossFadeState = CrossFadeState.showFirst);
+      });
+      _crossFadeState = CrossFadeState.showFirst;
+    }
+    
+    _isInit = true;  // Set to true to prevent duplicate initialization
+  }
+  super.didChangeDependencies();
+}
+
+
 
   @override
   void initState() {
@@ -249,6 +254,7 @@ class _SearchLocationState extends State<SearchLocation>
   }
 
   void _closeSearch() async {
+    
     if (!_animationController.isDismissed)
       await _animationController.animateTo(0.5);
     _fn.unfocus();
@@ -260,16 +266,25 @@ class _SearchLocationState extends State<SearchLocation>
     _textEditingController.addListener(_autocompletePlace);
   }
 
-  void customListener() {
-    Future.delayed(Duration(milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _tempInput = _textEditingController.text;
-        });
-        customListener();
-      }
-    });
-  }
+void customListener() {
+  // Handle text changes
+  _textEditingController.addListener(() {
+    if (mounted) {
+      setState(() {
+        _tempInput = _textEditingController.text;
+      });
+    }
+  });
+
+  // Handle focus changes
+  _fn.addListener(() {
+    if (!_fn.hasFocus && isKeyboardOpen(context)) {
+      _closeSearch();  // Close search if focus is lost while the keyboard is open
+    }
+  });
+}
+
+
 
   @override
   void dispose() {
@@ -294,7 +309,7 @@ class _SearchLocationState extends State<SearchLocation>
         animation: _animationController,
         builder: (context, _) {
           return Container(
-            height: _containerHeight!.value,
+            // height: _containerHeight!.value,
             decoration: _containerDecoration(),
             child: Column(
               children: <Widget>[
@@ -330,10 +345,11 @@ class _SearchLocationState extends State<SearchLocation>
           place.length < 45
               ? "$place"
               : "${place.replaceRange(45, place.length, "")} ...",
-          style: widget.textStyle ?? TextStyle(
-            fontSize: MediaQuery.of(context).size.width * 0.04,
-            color: widget.darkMode ? Colors.grey[100] : Colors.grey[850],
-          ),
+          style: widget.textStyle ??
+              TextStyle(
+                fontSize: MediaQuery.of(context).size.width * 0.04,
+                color: widget.darkMode ? Colors.grey[100] : Colors.grey[850],
+              ),
           maxLines: 1,
         ),
         contentPadding: EdgeInsets.symmetric(
@@ -371,10 +387,12 @@ class _SearchLocationState extends State<SearchLocation>
               onEditingComplete: _selectPlace,
               autofocus: false,
               focusNode: _fn,
-              style: widget.textStyle ?? TextStyle(
-                fontSize: MediaQuery.of(context).size.width * 0.04,
-                color: widget.darkMode ? Colors.grey[100] : Colors.grey[850],
-              ),
+              style: widget.textStyle ??
+                  TextStyle(
+                    fontSize: MediaQuery.of(context).size.width * 0.04,
+                    color:
+                        widget.darkMode ? Colors.grey[100] : Colors.grey[850],
+                  ),
             ),
           ),
           // Container(width: 15),
@@ -407,7 +425,7 @@ class _SearchLocationState extends State<SearchLocation>
       border: InputBorder.none,
       prefixIcon: Icon(Icons.search, color: widget.iconColor),
       suffixIcon: widget.hasClearButton
-          ?  Icon(Icons.clear, color: widget.iconColor)
+          ? Icon(Icons.clear, color: widget.iconColor)
           : null,
       contentPadding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
       hintStyle: TextStyle(
