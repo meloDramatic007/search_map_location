@@ -54,17 +54,14 @@ class SearchLocation extends StatefulWidget {
   /// Place type to filter the search. This is a tool that can be used if you only want to search for a specific type of location. If this no place type is provided, all types of places are searched. For more info on location types, check https://developers.google.com/places/web-service/autocomplete?#place_types
   final PlaceType? placeType;
 
-  /// The initial icon to show in the search box
-  final IconData icon;
+ 
 
   /// Makes available "clear textfield" button when the user is writing.
   final bool hasClearButton;
 
-  /// The icon to show indicating the "clear textfield" button
-  final Widget? clearIcon;
 
-   /// The icon to show indicating the "search" 
-  final Widget? searchIcon;
+
+  
 
   /// The color of the icon to show in the search box
   final Color iconColor;
@@ -72,13 +69,12 @@ class SearchLocation extends StatefulWidget {
   /// Enables Dark Mode when set to `true`. Default value is `false`.
   final bool darkMode;
 
+  final InputDecoration? inputDecoration;
+
   SearchLocation({
     required this.apiKey,
     this.placeholder = 'Search',
-    this.icon = Icons.search,
     this.hasClearButton = true,
-    this.searchIcon,
-    this.clearIcon ,
     this.iconColor = Colors.blue,
     this.onSelected,
     this.onSearch,
@@ -91,6 +87,7 @@ class SearchLocation extends StatefulWidget {
     this.strictBounds = false,
     this.placeType,
     this.darkMode = false,
+    this.inputDecoration,
     Key? key,
   }) : super(key: key);
 
@@ -365,7 +362,7 @@ class _SearchLocationState extends State<SearchLocation>
                   widget.onChangeText!(value);
                 }
               },
-              decoration: _inputStyle(),
+              decoration: widget.inputDecoration ?? _inputStyle(),
               controller: _textEditingController,
               onSubmitted: (_) => _selectPlace(),
               onEditingComplete: _selectPlace,
@@ -405,9 +402,9 @@ class _SearchLocationState extends State<SearchLocation>
     return InputDecoration(
       hintText: this.widget.placeholder,
       border: InputBorder.none,
-      prefixIcon: widget.searchIcon ?? Icon(Icons.search, color: widget.iconColor),
+      prefixIcon: Icon(Icons.search, color: widget.iconColor),
       suffixIcon: widget.hasClearButton
-          ? widget.clearIcon ?? Icon(Icons.clear, color: widget.iconColor)
+          ?  Icon(Icons.clear, color: widget.iconColor)
           : null,
       contentPadding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
       hintStyle: TextStyle(
