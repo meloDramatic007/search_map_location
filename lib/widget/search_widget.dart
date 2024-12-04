@@ -289,70 +289,35 @@ class _SearchLocationState extends State<SearchLocation>
     );
   }
 
-  // Widget _searchContainer({@required Widget? child}) {
-  //   return AnimatedBuilder(
-  //       animation: _animationController,
-  //       builder: (context, _) {
-  //         return Container(
-  //           height: _containerHeight!.value,
-  //           decoration: _containerDecoration(),
-  //           child: Column(
-  //             children: <Widget>[
-  //               Padding(
-  //                 padding:
-  //                     const EdgeInsets.only(left: 12.0, right: 12.0, top: 4),
-  //                 child: child,
-  //               ),
-  //               if (_placePredictions.length > 0)
-  //                 Opacity(
-  //                   opacity: _listOpacity!.value,
-  //                   child: Column(
-  //                     children: <Widget>[
-  //                       for (var prediction in _placePredictions)
-  //                         _placeOption(Place.fromJSON(prediction, geocode!)),
-  //                     ],
-  //                   ),
-  //                 ),
-  //             ],
-  //           ),
-  //         );
-  //       });
-  // }
-Widget _searchContainer({@required Widget? child}) {
-  return AnimatedBuilder(
-    animation: _animationController,
-    builder: (context, _) {
-      double keyboardHeight = MediaQuery.of(context).viewInsets.bottom; // Detects keyboard height
-
-      return SingleChildScrollView( // Prevents overflow
-        physics: ClampingScrollPhysics(),
-        child: Container(
-          height: _containerHeight!.value,
-          decoration: _containerDecoration(),
-          padding: EdgeInsets.only(bottom: keyboardHeight), // Adjusts for keyboard
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 4),
-                child: child,
-              ),
-              if (_placePredictions.length > 0)
-                Opacity(
-                  opacity: _listOpacity!.value,
-                  child: Column(
-                    children: <Widget>[
-                      for (var prediction in _placePredictions)
-                        _placeOption(Place.fromJSON(prediction, geocode!)),
-                    ],
-                  ),
+  Widget _searchContainer({@required Widget? child}) {
+    return AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, _) {
+          return Container(
+            height: _containerHeight!.value,
+            decoration: _containerDecoration(),
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 12.0, right: 12.0, top: 4),
+                  child: child,
                 ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
-}
+                if (_placePredictions.length > 0)
+                  Opacity(
+                    opacity: _listOpacity!.value,
+                    child: Column(
+                      children: <Widget>[
+                        for (var prediction in _placePredictions)
+                          _placeOption(Place.fromJSON(prediction, geocode!)),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          );
+        });
+  }
 
   Widget _placeOption(Place prediction) {
     String place = prediction.description;
