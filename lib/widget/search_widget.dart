@@ -298,10 +298,12 @@ class _SearchLocationState extends State<SearchLocation>
             decoration: _containerDecoration(),
             child: Column(
               children: <Widget>[
-                Padding(
-                  padding:
-                      const EdgeInsets.only(left: 12.0, right: 12.0, top: 4),
-                  child: child,
+                Expanded(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(left: 12.0, right: 12.0, top: 4),
+                    child: child,
+                  ),
                 ),
                 if (_placePredictions.length > 0)
                   Opacity(
@@ -330,7 +332,7 @@ class _SearchLocationState extends State<SearchLocation>
           place.length < 45
               ? "$place"
               : "${place.replaceRange(45, place.length, "")} ...",
-          style: TextStyle(
+          style: widget.textStyle ?? TextStyle(
             fontSize: MediaQuery.of(context).size.width * 0.04,
             color: widget.darkMode ? Colors.grey[100] : Colors.grey[850],
           ),
