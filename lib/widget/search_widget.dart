@@ -71,6 +71,8 @@ class SearchLocation extends StatefulWidget {
 
   final InputDecoration? inputDecoration;
 
+  final TextStyle? textStyle;
+
   SearchLocation({
     required this.apiKey,
     this.placeholder = 'Search',
@@ -88,6 +90,7 @@ class SearchLocation extends StatefulWidget {
     this.placeType,
     this.darkMode = false,
     this.inputDecoration,
+    this.textStyle,
     Key? key,
   }) : super(key: key);
 
@@ -368,7 +371,7 @@ class _SearchLocationState extends State<SearchLocation>
               onEditingComplete: _selectPlace,
               autofocus: false,
               focusNode: _fn,
-              style: TextStyle(
+              style: widget.textStyle ?? TextStyle(
                 fontSize: MediaQuery.of(context).size.width * 0.04,
                 color: widget.darkMode ? Colors.grey[100] : Colors.grey[850],
               ),
