@@ -298,12 +298,10 @@ class _SearchLocationState extends State<SearchLocation>
             decoration: _containerDecoration(),
             child: Column(
               children: <Widget>[
-                Expanded(
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.only(left: 12.0, right: 12.0, top: 4),
-                    child: child,
-                  ),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 12.0, right: 12.0, top: 4),
+                  child: child,
                 ),
                 if (_placePredictions.length > 0)
                   Opacity(
