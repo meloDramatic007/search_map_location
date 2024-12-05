@@ -51,7 +51,7 @@ class SearchLocation extends StatefulWidget {
 }
 
 class _SearchLocationState extends State<SearchLocation> with TickerProviderStateMixin {
-  TextEditingController _textEditingController = TextEditingController();
+   TextEditingController _textEditingController = TextEditingController();
   late AnimationController _animationController;
   late Animation<double> _containerHeight;
   late Animation<double> _listOpacity;
@@ -72,7 +72,14 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     _listOpacity = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
 
     _textEditingController.addListener(_autocompletePlace);
-
+    
+    // if(_textEditingController.text.isNotEmpty){
+    //   log("message");
+    //   setState(() {
+    //     _isEditing = true;
+    //   });
+      
+    // }
     if (widget.hasClearButton) {
       _fn.addListener(() {
         setState(() {
@@ -92,7 +99,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
 
     // If input is empty, clear predictions
     if (input.isEmpty) {
-      if (!_containerHeight.isDismissed) _closeSearch();
+      // if (!_containerHeight.isDismissed) _closeSearch();
       _fn.unfocus();
       setState(() {
         _placePredictions.clear();
@@ -102,7 +109,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     }
 
     // Only proceed if input has changed
-    if (input != _currentInput) {
+    // if (input != _currentInput) {
       setState(() {
         _currentInput = input;
         _isEditing = true;
@@ -116,7 +123,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
           _animationController.forward();
         });
       });
-    }
+    // }
   }
 
   Future<List<dynamic>> _makeRequest(String input) async {
@@ -146,6 +153,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
   }
 
   void _closeSearch() async {
+   
     _fn.unfocus();
     setState(() {
       _placePredictions.clear();
@@ -171,6 +179,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
   }
 
   Widget _searchContainer({required Widget child}) {
+    
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, _) {
